@@ -1,0 +1,739 @@
+:root {
+  --ivory: #f8f3ea;
+  --paper: #fffdf8;
+  --ink: #3a3128;
+  --ink-soft: rgba(58, 49, 40, 0.68);
+  --gold: #94703a;
+  --gold-soft: #e9dcc0;
+  --line: rgba(58, 49, 40, 0.14);
+  --sunday: #c0605a;
+  --saturday: #5a7bb0;
+  --desk: #e9e1d3;
+  --scrim: rgba(248, 243, 234, 0.82);
+  --serif: 'Gowun Batang', 'Nanum Myeongjo', 'AppleMyungjo', serif;
+  --latin: 'Cormorant Garamond', 'Gowun Batang', Georgia, serif;
+  --sans: 'Pretendard Variable', Pretendard, system-ui, -apple-system, 'Apple SD Gothic Neo',
+    'Malgun Gothic', sans-serif;
+  --column: 480px;
+  --gutter: 28px;
+  /* Bottom-anchored stage controls clear the browser toolbar when it is shown
+     (see the @supports rule below). */
+  --toolbar-overlap: 0px;
+  --hint-bottom: calc(max(28px, env(safe-area-inset-bottom, 0px)) + var(--toolbar-overlap));
+  color-scheme: light;
+}
+
+/* The stage is sized to the largest viewport, so on mobile its lowest strip
+   sits behind the browser toolbar while the toolbar is shown. */
+@supports (height: 100lvh) {
+  :root {
+    --toolbar-overlap: calc(100lvh - 100svh);
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  background: var(--desk);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  /* Korean wraps between words, not between syllables. */
+  word-break: keep-all;
+}
+
+a {
+  color: inherit;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* The invitation column: full width on a phone, a centred phone-width card on
+   wider screens. */
+.invite {
+  width: 100%;
+  max-width: var(--column);
+  margin-inline: auto;
+  background: var(--ivory);
+  box-shadow: 0 0 80px rgba(58, 49, 40, 0.12);
+}
+
+/* Story: a pinned stage over a stack of scroll-length chapters. Both share
+   one grid cell, so the stage sticks for the whole opening and scrolls away
+   with its last screen. */
+
+.story {
+  display: grid;
+}
+
+.story__stage,
+.story__chapters {
+  grid-area: 1 / 1;
+}
+
+.story__stage {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  align-self: start;
+  /* The largest viewport keeps the stage covering the screen while the mobile
+     toolbar slides away, without resizing the canvas mid-scroll. */
+  height: 100vh;
+  height: 100lvh;
+  overflow: clip;
+}
+
+.story__canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--ivory);
+}
+
+.story__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: linear-gradient(180deg, var(--scrim) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+.chapter {
+  position: relative;
+  height: calc(var(--length) * 1svh);
+}
+
+/* Copy swaps in place while its chapter is on screen (see main.js). */
+.chapter__copy {
+  position: absolute;
+  top: 9svh;
+  left: var(--gutter);
+  right: var(--gutter);
+  z-index: 5;
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  text-align: center;
+}
+
+.eyebrow {
+  font-family: var(--latin);
+  font-size: 18px;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  color: var(--gold);
+}
+
+.chapter__title {
+  font-family: var(--serif);
+  font-size: clamp(30px, 8.4vw, 40px);
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+}
+
+.chapter__title--latin {
+  font-family: var(--latin);
+  font-size: clamp(40px, 11vw, 52px);
+  letter-spacing: 0.06em;
+}
+
+.chapter__body {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--ink-soft);
+}
+
+/* Tap target on the sealed envelope that plays the opening. */
+.open-hint {
+  position: absolute;
+  bottom: var(--hint-bottom);
+  left: 50%;
+  z-index: 5;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.72);
+  backdrop-filter: blur(8px);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  translate: -50% 0;
+  cursor: pointer;
+}
+
+.open-hint__track {
+  position: relative;
+  width: 2px;
+  height: 32px;
+  overflow: hidden;
+  background: color-mix(in srgb, currentColor 22%, transparent);
+}
+
+.open-hint__track::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gold);
+  animation: open-hint 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@keyframes open-hint {
+  from {
+    translate: 0 -100%;
+  }
+  to {
+    translate: 0 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .open-hint__track::after {
+    animation: none;
+  }
+}
+
+/* Sections after the film */
+
+.section {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  padding: 96px var(--gutter);
+  border-top: 1px solid var(--line);
+  background: var(--ivory);
+  text-align: center;
+}
+
+.section__title {
+  font-family: var(--serif);
+  font-size: 26px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.section__lead {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ink-soft);
+}
+
+.section__note {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.btn {
+  padding: 15px 32px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn:hover,
+.btn:focus-visible {
+  background: var(--gold);
+}
+
+.chip {
+  padding: 7px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.chip:hover,
+.chip:focus-visible {
+  border-color: var(--gold);
+}
+
+/* Greeting */
+
+.greeting__poem {
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 2.1;
+}
+
+.greeting__family {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+  font-size: 15px;
+}
+
+.greeting__family div {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.greeting__family dt span {
+  color: var(--ink-soft);
+}
+
+.greeting__family dd {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 19px;
+}
+
+/* Date: scratch cards, calendar and countdown */
+
+.scratch-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+  margin-top: 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.scratch-card {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1 / 1.1;
+  overflow: hidden;
+  border: 1px solid var(--gold-soft);
+  border-radius: 14px;
+  background: var(--paper);
+}
+
+.scratch-card__value {
+  font-family: var(--serif);
+  font-size: 22px;
+}
+
+.scratch-card__foil {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: grab;
+  transition: opacity 0.6s ease;
+}
+
+.scratch-card__foil[data-cleared='true'] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.calendar {
+  width: 100%;
+  margin-top: 28px;
+}
+
+.calendar__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.calendar__table caption {
+  margin-bottom: 14px;
+  font-family: var(--serif);
+  font-size: 18px;
+}
+
+.calendar__table th {
+  padding-bottom: 10px;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.calendar__table td {
+  height: 40px;
+}
+
+.calendar__table :is(th, td):first-child {
+  color: var(--sunday);
+}
+
+.calendar__table :is(th, td):last-child {
+  color: var(--saturday);
+}
+
+.calendar__table .calendar__day--wedding {
+  position: relative;
+  color: var(--paper);
+}
+
+.calendar__table .calendar__day--wedding::before {
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  z-index: -1;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--gold);
+  translate: -50% -50%;
+}
+
+.calendar__table tbody td {
+  position: relative;
+  z-index: 0;
+}
+
+.countdown {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+  margin-top: 20px;
+  padding: 22px 12px;
+  border-radius: 16px;
+  background: var(--paper);
+}
+
+.countdown__label {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.countdown__units {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.countdown__units b {
+  margin-right: 2px;
+  font-family: var(--latin);
+  font-size: 30px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+/* Gallery: a swipeable strip */
+
+.gallery__track {
+  display: flex;
+  gap: 12px;
+  width: calc(100% + 2 * var(--gutter));
+  margin-top: 8px;
+  padding: 0 var(--gutter);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
+  scrollbar-width: none;
+  list-style: none;
+}
+
+.gallery__track li {
+  flex: 0 0 78%;
+  scroll-snap-align: start;
+}
+
+.gallery__track img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 14px;
+  object-fit: cover;
+}
+
+.gallery__hint {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+
+/* Venue */
+
+.venue__image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  margin-top: 8px;
+  border-radius: 14px;
+  object-fit: cover;
+}
+
+.venue__place {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+}
+
+.venue__name {
+  font-family: var(--serif);
+  font-size: 20px;
+}
+
+.venue__address {
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.venue__maps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+.map-link {
+  padding: 12px 6px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+  font-size: 13px;
+  text-decoration: none;
+  transition: border-color 0.3s;
+}
+
+.map-link:hover,
+.map-link:focus-visible {
+  border-color: var(--gold);
+}
+
+.venue__ways {
+  display: grid;
+  gap: 14px;
+  width: 100%;
+  margin-top: 10px;
+  text-align: left;
+  font-size: 14px;
+}
+
+.venue__ways div {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 10px;
+}
+
+.venue__ways dt {
+  font-weight: 600;
+  color: var(--gold);
+}
+
+.venue__ways dd {
+  margin: 0;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+/* Gift accounts */
+
+.account {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  text-align: left;
+}
+
+.account summary {
+  padding: 16px 18px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.account ul {
+  display: grid;
+  gap: 12px;
+  padding: 0 18px 18px;
+  list-style: none;
+}
+
+.account li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+/* RSVP */
+
+.rsvp__form {
+  display: grid;
+  gap: 18px;
+  width: 100%;
+  margin-top: 8px;
+  text-align: left;
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+}
+
+.segmented legend {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.segmented label {
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+}
+
+.segmented input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.segmented label:has(input:checked) {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.segmented label:has(input:focus-visible) {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.field input {
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+}
+
+.field input:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+
+.rsvp__form .btn {
+  margin-top: 6px;
+}
+
+.rsvp__done {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 24px 18px;
+  border-radius: 16px;
+  background: var(--paper);
+}
+
+.rsvp__summary {
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+/* Footer */
+
+.footer {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  padding: 72px var(--gutter) calc(72px + env(safe-area-inset-bottom, 0px));
+  background: var(--ink);
+  color: var(--paper);
+  text-align: center;
+}
+
+.footer__thanks {
+  font-family: var(--serif);
+  font-size: 18px;
+}
+
+.chip--light {
+  border-color: rgba(255, 253, 248, 0.3);
+  background: none;
+  color: var(--paper);
+}
+
+.footer__names {
+  font-family: var(--latin);
+  font-size: 22px;
+  font-style: italic;
+  color: var(--gold-soft);
+}
+
+/* Toast for copy results */
+
+.toast {
+  position: fixed;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  z-index: 30;
+  max-width: min(420px, calc(100vw - 32px));
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 14px;
+  text-align: center;
+  opacity: 0;
+  translate: -50% 12px;
+  pointer-events: none;
+  transition:
+    opacity 0.3s ease,
+    translate 0.3s ease;
+}
+
+.toast[data-visible='true'] {
+  opacity: 1;
+  translate: -50% 0;
+}
