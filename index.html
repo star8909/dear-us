@@ -4,14 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>도윤 ♥ 서연 결혼합니다</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%2394703a'/%3E%3Ctext x='16' y='21' font-size='14' text-anchor='middle' fill='%23fffdf8' font-family='serif'%3E%E2%99%A5%3C/text%3E%3C/svg%3E" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%232b2723'/%3E%3Ctext x='16' y='21' font-size='14' text-anchor='middle' fill='%23fffdf8' font-family='serif'%3E%E2%99%A5%3C/text%3E%3C/svg%3E" />
     <meta name="description" content="2027년 5월 15일 토요일 오후 1시, 소담 한옥정원에서 김도윤과 이서연이 결혼합니다." />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;1,400&family=Gowun+Batang&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="preconnect" href="https://hangeul.pstatic.net" crossorigin />
     <link
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
       rel="stylesheet"
@@ -24,7 +19,8 @@
            continuous film on its canvas. Each [data-clip] chapter scrubs the
            frames in src/assets/clips/<id>/portrait/ across its scroll length
            (--length, in viewport heights); the last chapter holds the final
-           frame. The [data-copy] blocks pair with the chapters in order. -->
+           frame. The [data-copy] blocks pair with the chapters in order, and
+           the open hint plays the film up to the [data-open-to] chapter. -->
       <main class="story" id="top">
         <div class="story__stage" data-stage>
           <canvas class="story__canvas" data-film aria-hidden="true"></canvas>
@@ -37,13 +33,18 @@
 
           <div class="chapter__copy" data-copy>
             <p class="eyebrow">Save the date</p>
-            <h2 class="chapter__title chapter__title--latin" id="title-reveal" data-lines>2027. 05. 15</h2>
+            <h2 class="chapter__title chapter__title--date" id="title-glowing" data-lines>2027. 05. 15</h2>
+          </div>
+
+          <div class="chapter__copy" data-copy>
+            <p class="eyebrow">Saturday, 1 PM</p>
+            <h2 class="chapter__title" id="title-arriving" data-lines>봄날의 한옥에서</h2>
+            <p class="chapter__body">소담 한옥정원</p>
           </div>
 
           <div class="chapter__copy" data-copy>
             <p class="eyebrow">We are getting married</p>
             <h2 class="chapter__title" id="title-blossom" data-lines>김도윤 그리고<br />이서연</h2>
-            <p class="chapter__body">2027년 5월 15일 토요일 오후 1시<br />소담 한옥정원</p>
           </div>
 
           <div class="chapter__copy" data-copy>
@@ -60,8 +61,11 @@
 
         <div class="story__chapters">
           <section class="chapter" data-clip="opening" aria-labelledby="title-opening" style="--length: 180"></section>
-          <section class="chapter" data-clip="reveal" aria-labelledby="title-reveal" style="--length: 200"></section>
-          <section class="chapter" data-clip="blossom" aria-labelledby="title-blossom" style="--length: 200"></section>
+          <section class="chapter" data-clip="glowing" aria-labelledby="title-glowing" style="--length: 140"></section>
+          <!-- The glow dissolves into the courtyard early in this clip, so the
+               ease gives that dissolve more of the scroll. -->
+          <section class="chapter" data-clip="arriving" data-ease="power2.in" aria-labelledby="title-arriving" style="--length: 240"></section>
+          <section class="chapter" data-clip="blossom" data-open-to aria-labelledby="title-blossom" style="--length: 200"></section>
           <section class="chapter" aria-labelledby="title-hold" style="--length: 160"></section>
         </div>
       </main>
@@ -226,7 +230,7 @@
 
       <footer class="footer">
         <p class="footer__thanks">함께해 주셔서 감사합니다</p>
-        <button class="chip chip--light" type="button" data-clipboard-url>청첩장 링크 복사</button>
+        <button class="chip" type="button" data-clipboard-url>청첩장 링크 복사</button>
         <p class="footer__names">Doyun &amp; Seoyeon</p>
       </footer>
     </div>

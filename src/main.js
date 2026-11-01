@@ -73,13 +73,15 @@ const currentChapter = (triggers) =>
   Math.max(0, triggers.findLastIndex((trigger) => trigger.scroll() >= trigger.start));
 
 // Each clip chapter scrubs its clip; chapters after the last clip hold its
-// final frame.
-function createFilm(tracks, triggers, renderer) {
+// final frame. A chapter's data-ease (a GSAP ease name) maps its scroll to
+// the clip, so a clip whose change happens early can give it more scroll.
+function createFilm(tracks, triggers, chapters, renderer) {
+  const eases = chapters.map((chapter) => gsap.parseEase(chapter.dataset.ease ?? 'none'));
   // Draws the frame for `chapter` and returns the index of the clip shown.
   return (chapter) => {
     if (tracks.length === 0) return 0;
     const trackIndex = Math.min(chapter, tracks.length - 1);
-    const progress = chapter < tracks.length ? triggers[chapter].progress : 1;
+    const progress = chapter < tracks.length ? eases[chapter](triggers[chapter].progress) : 1;
     renderer.draw(tracks[trackIndex].frameAt(progress));
     return trackIndex;
   };
@@ -121,10 +123,11 @@ function setupChapters(chapters) {
 }
 
 // Tapping the sealed envelope plays the opening by scrolling through it to the
-// couple; the hint fades out once the envelope starts to open.
-function setupOpening(triggers, lenis) {
+// [data-open-to] chapter; the hint fades out once the envelope starts to open.
+function setupOpening(chapters, triggers, lenis) {
   const hint = document.querySelector('[data-open-hint]');
-  const target = triggers[Math.min(2, triggers.length - 1)];
+  const target = triggers[chapters.findIndex((chapter) => chapter.hasAttribute('data-open-to'))];
+  if (!target) throw new Error('No [data-open-to] chapter for the open hint');
   hint.addEventListener('click', () => scrollToPosition(lenis, target.start, 3.2));
   gsap.to(hint, {
     autoAlpha: 0,
@@ -158,6 +161,7 @@ async function init() {
   const renderFilm = createFilm(
     loader.tracks,
     triggers,
+    chapters,
     new CanvasRenderer(document.querySelector('[data-film]')),
   );
   loader.start();
@@ -169,7 +173,7 @@ async function init() {
     loader.focus(renderFilm(chapter));
     showChapter(chapter);
   });
-  setupOpening(triggers, lenis);
+  setupOpening(chapters, triggers, lenis);
 
   const when = document.querySelector('[data-wedding]');
   const wedding = new Date(when.dataset.wedding);

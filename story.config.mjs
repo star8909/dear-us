@@ -54,6 +54,16 @@ export const stills = [
       'envelope.',
   },
   {
+    // The joint between the envelope and the courtyard: both clips meet on a
+    // frame of plain light, so the scene changes under it instead of cutting.
+    id: 'glow',
+    from: ['opened'],
+    prompt:
+      'The warm golden light from inside the envelope has bloomed to fill the entire frame: an ' +
+      'almost pure soft white-gold glow, the envelope and paper barely visible as the faintest ' +
+      'outline beneath the light.',
+  },
+  {
     id: 'gate',
     prompt:
       'A Korean bride and groom seen from behind, walking hand in hand through the open wooden ' +
@@ -84,13 +94,21 @@ export const clips = [
       'golden light glowing out from inside.',
   },
   {
-    id: 'reveal',
+    id: 'glowing',
     from: 'opened',
+    to: 'glow',
+    motion:
+      'The camera slowly pushes in toward the open envelope as the golden light inside swells ' +
+      'and brightens until the soft glow fills the whole frame.',
+  },
+  {
+    id: 'arriving',
+    from: 'glow',
     to: 'gate',
     motion:
-      'The camera glides down into the golden glow of the open envelope, the light blooms to ' +
-      'fill the frame and softly fades into the hanok courtyard where the couple walk through ' +
-      'the gate.',
+      'The bright glow slowly softens and clears like morning haze, gradually revealing the ' +
+      'hanok courtyard where the couple walk hand in hand through the gate; one continuous ' +
+      'dissolve with no cut.',
   },
   {
     id: 'blossom',

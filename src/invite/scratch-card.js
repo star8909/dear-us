@@ -1,4 +1,4 @@
-// Gold foil over each date card that is scratched away with a finger or the
+// Pearl foil over each date card that is scratched away with a finger or the
 // mouse. Once most of the foil is gone the rest fades out by itself.
 
 const BRUSH_RADIUS = 18;
@@ -9,14 +9,14 @@ const SAMPLE_STEP = 8;
 function paintFoil(canvas, context) {
   const { width, height } = canvas;
   const gradient = context.createLinearGradient(0, 0, width, height);
-  gradient.addColorStop(0, '#d9c08a');
-  gradient.addColorStop(0.45, '#f4e6c1');
-  gradient.addColorStop(0.55, '#e8d29d');
-  gradient.addColorStop(1, '#c5a565');
+  gradient.addColorStop(0, '#dcd7d0');
+  gradient.addColorStop(0.45, '#f3f0eb');
+  gradient.addColorStop(0.55, '#e7e2db');
+  gradient.addColorStop(1, '#cfc8bf');
   context.globalCompositeOperation = 'source-over';
   context.fillStyle = gradient;
   context.fillRect(0, 0, width, height);
-  context.fillStyle = 'rgba(90, 66, 24, 0.55)';
+  context.fillStyle = 'rgba(43, 39, 35, 0.45)';
   context.font = `${Math.round(height * 0.12)}px Pretendard Variable, sans-serif`;
   context.textAlign = 'center';
   context.textBaseline = 'middle';
